@@ -33,8 +33,29 @@ public class StepDefsIntegrationTest extends SpringIntegrationTests {
 
         // Just printing the JSON for debugging purposes
         final JSONObject responseJSON = latestResponse.getJson();
-
+        System.out.println(responseJSON);
         final HttpStatus statusCode = latestResponse.getResponse().getStatusCode();
         assertThat("Status code is incorrect: " + responseJSON, statusCode.value(), is(200));
+
+        if (numEntries>1) {
+            JSONObject embedded = responseJSON.getJSONObject("_embedded");
+            JSONArray employeeList = embedded.getJSONArray("employeeList");
+
+            assertThat("Count is wrong: " + employeeList.length(), employeeList.length(), is(numEntries));
+        }
+        else{
+            String s = responseJSON.getString("firstName");
+            assertThat("No employee", s.length()>0);
+        }
+    }
+
+    @Then("^(\\d+) is returned$")
+    public void isReturned(int expectedHttpCode) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions;
+        final JSONObject responseJSON = latestResponse.getJson();
+        System.out.println(responseJSON);
+        final HttpStatus statusCode = latestResponse.getResponse().getStatusCode();
+
+        assertThat("Status code is incorrect: " + responseJSON, statusCode.value(), is(expectedHttpCode));
     }
 }
